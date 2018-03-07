@@ -21,32 +21,29 @@ func recieveUserInput()->String {
 //유저가 데이터 입력
 let userInput : String = recieveUserInput()
 
-//알파벳 추출용 함수
-func extractAlphabet (inputSentence : String) -> String {
+
+// 입력값을 숫자와 문자로 나누는 함수
+// 입력값을 받아서 튜플형태로 리턴
+func divideUserinput(tempInput:String)->(String,String){
     var inputMeasure : String = ""
-    for tempChar in inputSentence {
-        // 알파벳만 모아서 리턴
-        if (tempChar >= "a" && tempChar <= "z") || (tempChar >= "A" && tempChar <= "Z") {
-            inputMeasure += String(tempChar)
-        }
-    }
-    return inputMeasure
-}
-// 숫자 추출용 함수
-func extractNumber (inputSentence : String) -> String {
     var inputSize : String = ""
-    for tempChar in inputSentence {
+    var checkDivide : Int = 0
+    for tempChar in tempInput {
         // 숫자 혹은 . 만 모아서 리턴
-        if(tempChar >= "0" && tempChar <= "9" || tempChar == ".")  {
-            inputSize += String(tempChar)
+        if checkDivide == 0 {
+            if(tempChar >= "0" && tempChar <= "9" || tempChar == ".")  {
+                inputSize += String(tempChar)
+            } else {
+                checkDivide += 1
+                inputMeasure += String(tempChar)
+            }
+        }
+        else {inputMeasure += String(tempChar)
         }
     }
-    return inputSize
+    return (inputSize,inputMeasure)
 }
-//입력값에서 문자열만 남는 변수
-let inputMeasure : String = extractAlphabet(inputSentence: userInput)
-//입력값에서 숫자 문자열만 남는 변수
-let inputSize : String = extractNumber(inputSentence: userInput)
+let (inputSize , inputMeasure) = divideUserinput(tempInput:userInput)
 
 //숫자만 자른 숫자 string 을 더블타입으로 변환
 let inputNumber = (inputSize as NSString).doubleValue
@@ -68,7 +65,7 @@ func measureTransform(measure : String) -> String {
     // cm 이면 100을 곱해주고 cm을 붙여서 리턴
     case "m" :
         return (meterToCm(meterNumber : inputNumber))
-        
+    // 주어진 값 이외의 값이면 잘못된 단위 라는 메세지 출력
     default : return("wrong measure")
     }
 }
