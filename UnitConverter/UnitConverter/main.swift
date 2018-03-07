@@ -195,10 +195,14 @@ while stopSwitch == 0 {
             }
         //변환단위가 oz 인 경우
         case "oz" :
+            if inputMeasure == "g" {
             return ("\(gToOz(gNumber : transformedSize))oz")
+            }
         //변환단위가 lb 인 경우
         case "lb" :
-            return ("\(gToLb(gNumber : transformedSize))lb")
+            if inputMeasure == "g" {
+                return ("\(gToLb(gNumber : transformedSize))lb")
+            }
         // 이외의 값이라면 에러메세지 출력
         default :
             return ("지원하지 않는 단위 입니다.")
