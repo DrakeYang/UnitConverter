@@ -8,7 +8,16 @@
 
 import Foundation
 // 계속 쓰이는 단위 100 을 상수로 지정
-let measureHundred:Double = 100
+let measureCmToMeter : Double = 100
+// inch to cm 단위 저장
+let measureInchToCm : Double = 2.4
+// cm to yard 단위 저장
+let measureYardToCm : Double = 91.44
+
+//반복을 위한 while 변수 설정
+var stopSwitch : Int = 0
+//반복문 시작
+while stopSwitch == 0 {
 
 //유저 입력을 받는 함수
 func recieveUserInput()->String {
@@ -20,7 +29,10 @@ func recieveUserInput()->String {
 }
 //유저가 데이터 입력
 let userInput : String = recieveUserInput()
-
+    if userInput == "q" || userInput == "quit" {
+        stopSwitch += 1
+        break
+    }
 
 // 입력값을 숫자와 문자로 나누는 함수
 // 입력값을 받아서 튜플형태로 리턴
@@ -74,29 +86,42 @@ let inputNumber = (inputSize as NSString).doubleValue
 
 //cm 을 m 로 바꿔서 출력하는 함수
 func cmToMeter(cmNumber : Double) -> Double{
-    return (cmNumber / measureHundred)
+    return (cmNumber / measureCmToMeter)
 }
 //m 를 cm 으로 바꿔서 출력하는 함수
 func meterToCm(meterNumber : Double) -> Double{
-    return (meterNumber * measureHundred)
+    return (meterNumber * measureCmToMeter)
 }
 // cm 을 inch 로 바꿔서 출력하는 함수
 func cmToInch(cmNumber : Double) -> Double{
-    return (cmNumber / 2.4 )
+    return (cmNumber / measureInchToCm)
 }
 // inch to cm 함수
 func inchToCm(inchNumber : Double) -> Double{
-    return (inchNumber * 2.4 )
+    return (inchNumber * measureInchToCm )
 }
-//m > cm , cm > m 변환 출력 함수
+// cm to yard 함수
+func cmToYard(cmNumber : Double) -> Double{
+    return cmNumber / measureYardToCm
+}
+//yard to cm 함수
+func yardToCm(yardNumber : Double) -> Double{
+    return yardNumber * measureYardToCm
+}
+
+//변환할 단위가 없을 경우 사용하는 함수
 func measureTransformNoTarget(measure : String) -> String {
     switch measure{
     //cm 이면 100 으로 나누고 m 을 붙여서 리턴
     case "cm" :
         return ("\(cmToMeter(cmNumber : inputNumber))m")
-    // cm 이면 100을 곱해주고 cm을 붙여서 리턴
+    // m 이면 100을 곱해주고 cm을 붙여서 리턴
     case "m" :
         return ("\(Int(meterToCm(meterNumber : inputNumber)))cm")
+    // yard 의 경우 yard to cm , cm to m 진행
+    case "yard" :
+        //return ("\((cmToMeter(cmNumber : yardToCm(yardNumber : inputNumber))))m")
+        return ("\((cmToMeter(cmNumber : yardToCm(yardNumber : inputNumber))))m")
     // 주어진 값 이외의 값이면 잘못된 단위 라는 메세지 출력
     default : return("지원하지 않는 단위입니다.")
     }
@@ -106,7 +131,6 @@ func measureTransformNoTarget(measure : String) -> String {
 func measureTransformWithTarget(oringSize : Double , originMeasure : String, toMeasure : String) -> String{
     // 출력할 수치용 변수 선언
     var transformedSize : Double = oringSize
-    
     switch targetMeasure{
     // 목표단위가 inch 인 경우
     case "inch" :
@@ -114,23 +138,39 @@ func measureTransformWithTarget(oringSize : Double , originMeasure : String, toM
         if inputMeasure == "m" {
             transformedSize = meterToCm(meterNumber : transformedSize)
         }
+        else if inputMeasure == "yard"{
+            transformedSize = yardToCm(yardNumber : transformedSize)
+        }
         // inch 로 변환시킨후 inch 글자 붙여서 리턴
         return ("\(cmToInch(cmNumber : transformedSize))inch")
         
-    // inch to cm 변환 후 리턴
+    // 변환 단위가 cm 인 경우
     case  "cm" :
-        return ("\(Int(inchToCm(inchNumber : transformedSize)))cm")
+        //inch to cm 변환 후 리턴
+        if inputMeasure == "m" {
+            return ("\(Int(inchToCm(inchNumber : transformedSize)))cm")
+        }
+        else if inputMeasure == "yard"{
+           return ("\(yardToCm(yardNumber: transformedSize))cm")
+        }
         
-    // inch to cm 변환 후 다시 cm to m 변환 후 리턴
+    // 변환 단위가 m 인 경우
     case "m" :
-        return ("\(cmToMeter(cmNumber : (inchToCm(inchNumber : transformedSize))))m")
-        
+        // 입력단위가 inch 인 경우 inch to cm 변환 후 다시 cm to m 변환 후 리턴
+        if inputMeasure == "inch" {
+            return ("\(cmToMeter(cmNumber : (inchToCm(inchNumber : transformedSize))))m")
+        }
+        // 입력단위가 yard 인 경우
+        else if inputMeasure == "yard"{
+            return ("\(cmToMeter(cmNumber: yardToCm(yardNumber: transformedSize)))m")
+        }
     // 이외의 값이라면 에러메세지 출력
     default :
         return ("지원하지 않는 단위 입니다.")
-        
     }
+    return ("지원하지 않는 단위 입니다.")
 }
+
 //변환 출력 함수 실행 함수
 func printResult() {
     // 변환단위가 없으면 단위 없는 변환함수 사용
@@ -145,6 +185,4 @@ func printResult() {
 }
 //출력 실행
 printResult()
-
-
-
+}
