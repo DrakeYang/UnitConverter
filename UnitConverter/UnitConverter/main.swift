@@ -29,6 +29,10 @@ func calculateLength(number : Double ,from : String, to : String) -> String{
     let cmToYard : Double = 0.01
     // yard to cm  단위 저장
     let yardToCm : Double = 91.44
+    
+    // 값을 딕셔너리에 정리
+    let beforeCmMultiplier : [String : Double] = ["m":100,"cm":1,"yard":91.44,"inch":2.54]
+    let afterCmMuliplier : [String : Double] = ["m":0.01,"cm":1,"yard":0.01,"inch":0.39]
 
     //error message
     let errorMessage : String = "지원하지 않는 단위입니다."
@@ -143,8 +147,14 @@ func recieveUserInput()->String {
     //유저 입력을 받기 위해 입력을 요청
     print("Please enter size : ", terminator: "")
     //유저 입력을 받아서 userInput 에 입력
-    let userInput = readLine()!
-    return userInput
+    if let userInput = readLine(){
+        return userInput
+    }
+    else {
+        print ("입력이 없습니다")
+        return ("q")
+    }
+    
 }
 
 // 입력값을 숫자와 문자로 나누는 함수
@@ -237,13 +247,14 @@ func printResult(oringSize : Double , originMeasure : String, toMeasure : String
     }
         // 변환단위가 있으면 단위 있는 변환함수 사용
     else {
-        switch checkMeasureType(inputMeasureType : toMeasure) {
+        switch checkMeasureType(inputMeasureType : originMeasure) {
         case "length" :
             print(measureTransformWithLength(oringSize: oringSize, originMeasure: originMeasure, toMeasure: toMeasure))
             
         case "weight" :
             print(measureTransformWithWeight(oringSize: oringSize, originMeasure: originMeasure, toMeasure: toMeasure))
-        default : break
+        default :
+            print ("지원하지 않는 단위입니다.")
         }
     }
 }
