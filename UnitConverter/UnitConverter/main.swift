@@ -7,139 +7,54 @@
 //
 
 import Foundation
+
+// 숫자 현제단위 변경단위 를 입력받아 곱셈하는 함수
+func multiplier(inputOne : Double ,inputTwo : Double, inputThree : Double) -> Double{
+    return (inputOne * inputTwo * inputThree)
+}
+
+//에러메세지 출력 함수
+func returnErrorMessage() -> String{
+    return ("지원하지 않는 단위입니다.")
+}
+
+// 숫자와 닐체크 필요한 두 변수를 받아서 둘다 아니면 곱셈값 리턴 하나라도 닐이면 에러메세지 리턴
+func checkNilMultiplier(number : Double, second : Double?, third : Double?, targetMeasure : String) -> String{
+    if let nilCheckSecond = second , let nilCheckThird = third  {
+        return ("\(multiplier(inputOne: number, inputTwo: nilCheckSecond, inputThree: nilCheckThird))\(targetMeasure)")
+    }
+    else {
+        return returnErrorMessage()
+    }
+}
+
+// 계산용 공식을 저장하는 구조체
+//구체적인 공식내용은 딕셔너리로 정리
+struct formulaSe{
+    let lengthStepFirst : [String : Double] = ["m":100,"cm":1,"yard":91.44,"inch":2.54]
+    let lengthStepSecond : [String : Double] = ["m":0.01,"cm":1,"yard":0.01,"inch":0.39]
+    let weightStepFirst : [String : Double] = ["kg":1,"oz":35.27,"lb":0.45]
+    let weightStepSecond : [String : Double] = ["kg":1,"oz":0.02,"lb":2.2]
+}
+
 // 단위를 구조체로 정리
 func calculateLength(number : Double ,from : String, to : String) -> String{
-    // Cm To Meter 단위 저장
-    let cmToMeter : Double = 0.01
-    // M to Cm 단위 저장
-    let meterToCm : Double = 100
-    // inch to cm 단위 저장
-    let inchToCm : Double = 2.54
-    // cm to inch 단위 저장
-    let cmToInch : Double = 0.39
-    // inch to meter
-    let inchToMeter : Double = 0.02
-    // inch to yard
-    let inchToYard : Double = 0.02
-    //yard to inch
-    let yardToInch : Double = 36
-    // m to inch 단위 저장
-    let meterToInch : Double = 39.37
-    // cm to yard 단위 저장
-    let cmToYard : Double = 0.01
-    // yard to cm  단위 저장
-    let yardToCm : Double = 91.44
-    
     // 값을 딕셔너리에 정리
     let beforeCmMultiplier : [String : Double] = ["m":100,"cm":1,"yard":91.44,"inch":2.54]
     let afterCmMuliplier : [String : Double] = ["m":0.01,"cm":1,"yard":0.01,"inch":0.39]
-
-    //error message
-    let errorMessage : String = "지원하지 않는 단위입니다."
     
-    // 입력 단위 기준으로 계산 시작
-    switch from {
-    // 입력단위가 cm 일때
-    case "cm" :
-        //변환할 단위
-        switch to {
-        case "m" :
-            return ("\(number * cmToMeter)\(to)")
-        case "" :
-            return ("\(number * cmToMeter)m")
-        case "inch" :
-            return ("\(number * cmToInch)\(to)")
-        case "yard" :
-            return ("\(number * cmToYard)\(to)")
-        default : return(errorMessage)
-        }
-    // 입력단위가 m 일때
-    case "m" :
-        switch to {
-        case "cm" :
-            return ("\(number * meterToCm)\(to)")
-        case "" :
-            return ("\(number * meterToCm)cm")
-        case "inch" :
-            return ("\(number * meterToInch)\(to)")
-        case "yard" :
-            return ("\(number * meterToCm * cmToMeter)\(to)")
-        default : return(errorMessage)
-        }
-        // 입력단위가 inch 일때
-    case "inch" :
-        switch to {
-        case "cm" :
-            return ("\(number * inchToCm)\(to)")
-        case "m" :
-            return ("\(number * inchToMeter)\(to)")
-        case "yard" :
-            return ("\(number * inchToYard)\(to)")
-        default : return(errorMessage)
-        }
-        // 입력단위가 yard 일때
-    case "yard" :
-        switch to {
-        case "cm" :
-            return ("\(number * yardToCm)\(to)")
-        case "m" :
-            return ("\(number * yardToCm * cmToMeter)\(to)")
-        case "inch" :
-            return ("\(number * yardToInch)\(to)")
-        default : print(errorMessage)
-        }
-    default : return(errorMessage)
-    }
-    return errorMessage
+    // 곱하기 함수를 이용하여 결과 리턴. 딕셔너리에 없는 값일 경우 체크해서 else 문으로 보낸다.
+    return ("\(checkNilMultiplier(number: number, second: beforeCmMultiplier[from], third: afterCmMuliplier[to],targetMeasure : to))")
 }
 
 // 무게 계산용 함수
 func calculateWeight(number : Double ,from : String, to : String) -> String{
-    // oz to kg 단위 저장
-    let ozToKg : Double = 0.02
-    // kg to oz 단위 저장
-    let kgToOz : Double = 35.27
-    // lb to kg 단위 저장
-    let lbToKg : Double = 0.45
-    // kg to lb  단위 저장
-    let kgToLb : Double = 2.2
-    // lb to oz
-    let lbToOz : Double = 16
-    //oz to lb
-    let ozToLb : Double = 0.06
-    //error message
-    let errorMessage : String = "지원하지 않는 단위입니다."
-    // 변환할 단위로 분기 시작
-    switch from {
-        //입력 단위가 kg 일때
-    case "kg" :
-        switch to {
-        case "oz" :
-            return ("\(number * kgToOz)\(to)")
-        case "lb" :
-            return ("\(number * kgToLb)\(to)")
-        default : return(errorMessage)
-        }
-        // 입력단위가 oz
-    case "oz" :
-        switch to {
-        case "kg" :
-            return ("\(number * ozToKg)\(to)")
-        case "lb" :
-            return ("\(number * ozToLb)\(to)")
-        default : return(errorMessage)
-        }
-        // 입력단위가 lz
-    case "lb" :
-        switch to {
-        case "kg" :
-            return ("\(number * lbToKg)\(to)")
-        case "oz" :
-            return ("\(number * lbToOz)\(to)")
-        default : return(errorMessage)
-        }
-    default : return (errorMessage)
-    }
+    // 각 배율을 저장하는 변수
+    let beforeKgMultiplier : [String : Double] = ["kg":1,"oz":35.27,"lb":0.45]
+    let afterKgMuliplier : [String : Double] = ["kg":1,"oz":0.02,"lb":2.2]
+    
+    // 곱하기 함수를 이용하여 결과 리턴. 딕셔너리에 없는 값일 경우 체크해서 else 문으로 보낸다.
+    return ("\(checkNilMultiplier(number: number, second: beforeKgMultiplier[from], third: afterKgMuliplier[to],targetMeasure : to))")
 }
 
 //유저 입력을 받는 함수
@@ -202,11 +117,6 @@ func divideUserinput(tempInput : String)->(String , String , String){
     return (inputSize , inputMeasure , targetMeausure)
 }
 
-//숫자,입력된 단위, 목표단위를 입력받아 계산해서 출력해주는 함수
-func multiplier(number : Double , from : String , to : String , define : Double) -> String{
-    return("\(number*define)\(to)")
-}
-
 //변환할 단위가 없을 경우 사용하는 함수
 func measureTransformNoTarget(number : Double,originMeasure : String , targetMeasure : String  ) -> String {
     return ("\(calculateLength(number: number, from: originMeasure, to: targetMeasure))\(targetMeasure)")
@@ -214,6 +124,7 @@ func measureTransformNoTarget(number : Double,originMeasure : String , targetMea
 
 //변환 단위가 무게인지 길이인지 체크
 func checkMeasureType(inputMeasureType : String) -> String{
+    
     let kindOfLength = ["m","cm","inch","yard"]
     let kindOfWeight = ["kg","oz","lb"]
     if kindOfLength.contains(inputMeasureType){
@@ -223,7 +134,7 @@ func checkMeasureType(inputMeasureType : String) -> String{
         return ("weight")
     }
     else {
-        return ("out of support")
+        return returnErrorMessage()
     }
 }
 
@@ -254,7 +165,7 @@ func printResult(oringSize : Double , originMeasure : String, toMeasure : String
         case "weight" :
             print(measureTransformWithWeight(oringSize: oringSize, originMeasure: originMeasure, toMeasure: toMeasure))
         default :
-            print ("지원하지 않는 단위입니다.")
+            print (returnErrorMessage())
         }
     }
 }
