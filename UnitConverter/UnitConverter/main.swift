@@ -8,7 +8,7 @@
 
 import Foundation
 
-// 숫자 현제단위 변경단위 를 입력받아 곱셈하는 함수
+// 숫자 셋을 입력받아 곱셈하는 함수
 func multiplier(inputOne : Double ,inputTwo : Double, inputThree : Double) -> Double{
     return (inputOne * inputTwo * inputThree)
 }
@@ -18,43 +18,28 @@ func returnErrorMessage() -> String{
     return ("지원하지 않는 단위입니다.")
 }
 
-// 숫자와 닐체크 필요한 두 변수를 받아서 둘다 아니면 곱셈값 리턴 하나라도 닐이면 에러메세지 리턴
-func checkNilMultiplier(number : Double, second : Double?, third : Double?, targetMeasure : String) -> String{
-    if let nilCheckSecond = second , let nilCheckThird = third  {
-        return ("\(multiplier(inputOne: number, inputTwo: nilCheckSecond, inputThree: nilCheckThird))\(targetMeasure)")
-    }
-    else {
-        return returnErrorMessage()
-    }
-}
-
 // 계산용 공식을 저장하는 구조체
 //구체적인 공식내용은 딕셔너리로 정리
-struct formulaSe{
-    let lengthStepFirst : [String : Double] = ["m":100,"cm":1,"yard":91.44,"inch":2.54]
-    let lengthStepSecond : [String : Double] = ["m":0.01,"cm":1,"yard":0.01,"inch":0.39]
-    let weightStepFirst : [String : Double] = ["kg":1,"oz":35.27,"lb":0.45]
-    let weightStepSecond : [String : Double] = ["kg":1,"oz":0.02,"lb":2.2]
-}
-
-// 단위를 구조체로 정리
-func calculateLength(number : Double ,from : String, to : String) -> String{
-    // 값을 딕셔너리에 정리
-    let beforeCmMultiplier : [String : Double] = ["m":100,"cm":1,"yard":91.44,"inch":2.54]
-    let afterCmMuliplier : [String : Double] = ["m":0.01,"cm":1,"yard":0.01,"inch":0.39]
+struct FormulaSet{
+    let formula = ["length" : ["inWorking" :["m":100.0,"cm":1.0,"yard":91.44,"inch":2.54]
+                            , "outWorking" : ["m":0.01,"cm":1.0,"yard":0.01,"inch":0.39]]
+                ,"weight" : ["inWorking" : ["kg":1.0,"oz":35.27,"lb":0.45]
+                            , "outWorking" : ["kg":1.0,"oz":0.02,"lb":2.2]]]
     
-    // 곱하기 함수를 이용하여 결과 리턴. 딕셔너리에 없는 값일 경우 체크해서 else 문으로 보낸다.
-    return ("\(checkNilMultiplier(number: number, second: beforeCmMultiplier[from], third: afterCmMuliplier[to],targetMeasure : to))")
-}
-
-// 무게 계산용 함수
-func calculateWeight(number : Double ,from : String, to : String) -> String{
-    // 각 배율을 저장하는 변수
-    let beforeKgMultiplier : [String : Double] = ["kg":1,"oz":35.27,"lb":0.45]
-    let afterKgMuliplier : [String : Double] = ["kg":1,"oz":0.02,"lb":2.2]
-    
-    // 곱하기 함수를 이용하여 결과 리턴. 딕셔너리에 없는 값일 경우 체크해서 else 문으로 보낸다.
-    return ("\(checkNilMultiplier(number: number, second: beforeKgMultiplier[from], third: afterKgMuliplier[to],targetMeasure : to))")
+    func checkType(inputMeasure : String) -> String?  {
+        for type in formula.keys{
+            if formula[type]?["inWorking"]?[inputMeasure] != nil {
+                return type
+            }
+        }
+        return nil
+    }
+    func returnFormularNumber(type : String, inMeasure : String,outMeasure : String) -> (Double,Double)?{
+        if let inFormula = formula[type]?["inWorking"]?[inMeasure] ,let outFormula = formula[type]?["outWorking"]?[outMeasure] {
+            return (inFormula,outFormula)
+        }
+        return nil
+    }
 }
 
 //유저 입력을 받는 함수
@@ -65,11 +50,7 @@ func recieveUserInput()->String {
     if let userInput = readLine(){
         return userInput
     }
-    else {
-        print ("입력이 없습니다")
-        return ("q")
-    }
-    
+    return ""
 }
 
 // 입력값을 숫자와 문자로 나누는 함수
@@ -117,56 +98,16 @@ func divideUserinput(tempInput : String)->(String , String , String){
     return (inputSize , inputMeasure , targetMeausure)
 }
 
-//변환할 단위가 없을 경우 사용하는 함수
-func measureTransformNoTarget(number : Double,originMeasure : String , targetMeasure : String  ) -> String {
-    return ("\(calculateLength(number: number, from: originMeasure, to: targetMeasure))\(targetMeasure)")
+//변환할 단위가 없는경우를 위한 함수
+func fillEmptyTargetMeasure(inputMeasure : String, targetMeasure : String)-> String {
+    if inputMeasure == "cm" && targetMeasure == "" {
+        return "m"
     }
-
-//변환 단위가 무게인지 길이인지 체크
-func checkMeasureType(inputMeasureType : String) -> String{
-    
-    let kindOfLength = ["m","cm","inch","yard"]
-    let kindOfWeight = ["kg","oz","lb"]
-    if kindOfLength.contains(inputMeasureType){
-        return ("length")
-    }
-    else if kindOfWeight.contains(inputMeasureType){
-        return ("weight")
+    else if inputMeasure == "m" && targetMeasure == "" {
+        return "cm"
     }
     else {
-        return returnErrorMessage()
-    }
-}
-
-//변환할 단위가 길이인 경우 함수
-//함수의 인자 : 입력받은 수치, 원래 단위, 변환할 단위
-func measureTransformWithLength(oringSize : Double , originMeasure : String, toMeasure : String) -> String{
-    return calculateLength(number: oringSize, from: originMeasure, to: toMeasure)
-    }
-
-//변환할 단위가 무게인 경우 함수
-//함수의 인자 : 입력받은 수치, 원래 단위, 변환할 단위
-func measureTransformWithWeight(oringSize : Double , originMeasure : String, toMeasure : String) -> String{
-    return calculateWeight(number: oringSize, from: originMeasure, to: toMeasure)
-}
-
-//변환 출력 함수 실행 함수
-func printResult(oringSize : Double , originMeasure : String, toMeasure : String) {
-    // 변환단위가 없으면 단위 없는 변환함수 사용
-    if toMeasure == "" {
-        print(measureTransformNoTarget(number : oringSize , originMeasure : originMeasure , targetMeasure: toMeasure))
-    }
-        // 변환단위가 있으면 단위 있는 변환함수 사용
-    else {
-        switch checkMeasureType(inputMeasureType : originMeasure) {
-        case "length" :
-            print(measureTransformWithLength(oringSize: oringSize, originMeasure: originMeasure, toMeasure: toMeasure))
-            
-        case "weight" :
-            print(measureTransformWithWeight(oringSize: oringSize, originMeasure: originMeasure, toMeasure: toMeasure))
-        default :
-            print (returnErrorMessage())
-        }
+        return targetMeasure
     }
 }
 
@@ -180,12 +121,24 @@ while true {
     }
     
     // 위의 함수로 변환한 값을 각각의 변수에 입력
-    let (inputSize , inputMeasure , targetMeasure) = divideUserinput(tempInput : userInput)
+    var (inputSize , inputMeasure , targetMeasure) = divideUserinput(tempInput : userInput)
+    
+    // 구조체 선언
+    let formula = FormulaSet()
     
     //숫자만 자른 숫자 string 을 더블타입으로 변환. 아무값 없다면 0으로 치환됨
     let inputNumber = (inputSize as NSString).doubleValue
     
-    //출력 실행
-    printResult(oringSize: inputNumber, originMeasure: inputMeasure, toMeasure: targetMeasure)
+    //targetMeasure 가 비어있을 경우를 위해서 함수 실행.
+    targetMeasure = fillEmptyTargetMeasure(inputMeasure : inputMeasure,targetMeasure : targetMeasure)
+    
+    //입력받은 단위가 유효한 값인지 체크, 단위중 한개라도 딕셔너리에 없으면 에러메세지 표시
+    if let inputType = formula.checkType(inputMeasure: inputMeasure) , let targetType = formula.checkType(inputMeasure: targetMeasure) , inputType == targetType{
+        let (inFormula,outFormula) = formula.returnFormularNumber(type: inputType, inMeasure: inputMeasure,outMeasure : targetMeasure)!
+        print("\(multiplier(inputOne: inputNumber, inputTwo: inFormula, inputThree: outFormula))\(targetMeasure)")
+    }
+    else {
+        print (returnErrorMessage())
+    }
 }
 
