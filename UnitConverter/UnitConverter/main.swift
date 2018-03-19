@@ -8,12 +8,6 @@
 
 import Foundation
 
-
-// 에러메세지 출력 함수
-func printErrorMessage(){
-    print ("지원하지 않는 단위입니다.")
-}
-
 // 계산용 공식을 저장하는 구조체
 //구체적인 공식내용은 딕셔너리로 정리
 struct FormulaSet{
@@ -57,7 +51,7 @@ struct FormulaSet{
             return nil
         }
         if let (inFormula,outFormula) = formularNumberFrom(type: checkedmeasureTypeFrom, inMeasure: inputMeasure,outMeasure : targetMeasure){
-            return (CalculateAndPrint.multiplier(multipleOne: inFormula, multipleTwo: outFormula))
+            return (CalCulater.multiplier(multipleOne: inFormula, multipleTwo: outFormula))
         } else {
             return nil
         }
@@ -197,7 +191,7 @@ struct InputChecker {
 
 
 // 구체적인 계산에 쓰는 함수들이 모인 객체.
-struct CalculateAndPrint {
+struct CalCulater {
     // 숫자 셋을 입력받아 곱셈하는 함수
     static func multiplier(multipleOne : Double ,multipleTwo : Double, multipleThree : Double) -> Double{
         return (multipleOne * multipleTwo * multipleThree)
@@ -206,9 +200,19 @@ struct CalculateAndPrint {
     static func multiplier(multipleOne : Double ,multipleTwo : Double) -> Double{
         return (multipleOne * multipleTwo )
     }
+    
+}
+
+// 출력 함수들이 모인 객체
+struct MessagePrint {
     // 입력값,공식을 곱해서 타겟단위 붙여서 출력 후 runApp 실행해주는 함수
     static func printCalculation(inputNumber: Double, formula : Double, targetMeasure : String) {
-        print("\(multiplier(multipleOne: inputNumber, multipleTwo: formula))\(targetMeasure)")
+        print("\(CalCulater.multiplier(multipleOne: inputNumber, multipleTwo: formula))\(targetMeasure)")
+    }
+    
+    // 에러메세지 출력 함수
+    static func printErrorMessage(){
+        print ("지원하지 않는 단위입니다.")
     }
 }
 
@@ -220,30 +224,32 @@ func runApp(){
     let divider = InputDivider()
     let checker = InputChecker()
     
-    //유저가 데이터 입력
-    guard let userInput = getter.checkQuitOrNot() else {
-        return ()
+    while true {
+        //유저가 데이터 입력
+        guard let userInput = getter.checkQuitOrNot() else {
+            break
+        }
+        
+        // 위의 함수로 변환한 값을 각각의 변수에 입력
+        let (inputSize , inputMeasure , targetMeasure) = divider.dividedThreeFrom(letters: userInput)
+        
+        // 입력받은 숫자를 double 형태로 리턴하고, 타겟단위가 없는 경우 타겟리턴값을 리턴
+        guard let (inputNumber,checkedTargetMeasure) = checker.verifiedNumberAndTarget(number: inputSize, inputMeasure: inputMeasure, targetMeasure: targetMeasure ) else {
+            MessagePrint.printErrorMessage()
+            continue
+        }
+        
+        // 곱셈용 공식을 저장
+        guard let multiplyFormula = formula.totalFormulaFrom(inputMeasure: inputMeasure, targetMeasure: checkedTargetMeasure) else {
+            MessagePrint.printErrorMessage()
+            continue
+        }
+        
+        // 단위 변환용 수식을 입력받은 수에 대입하여 출력
+        MessagePrint.printCalculation(inputNumber: inputNumber, formula: multiplyFormula, targetMeasure: checkedTargetMeasure)
+        //  전체 프로세스 진행 후 다시 앱 실행
+        
     }
-    
-    // 위의 함수로 변환한 값을 각각의 변수에 입력
-    let (inputSize , inputMeasure , targetMeasure) = divider.dividedThreeFrom(letters: userInput)
-
-    // 입력받은 숫자를 double 형태로 리턴하고, 타겟단위가 없는 경우 타겟리턴값을 리턴
-    guard let (inputNumber,checkedTargetMeasure) = checker.verifiedNumberAndTarget(number: inputSize, inputMeasure: inputMeasure, targetMeasure: targetMeasure ) else {
-        printErrorMessage()
-        return runApp()
-    }
-
-    // 곱셈용 공식을 저장
-    guard let multiplyFormula = formula.totalFormulaFrom(inputMeasure: inputMeasure, targetMeasure: checkedTargetMeasure) else {
-        printErrorMessage()
-        return runApp()
-    }
-    
-    // 단위 변환용 수식을 입력받은 수에 대입하여 출력
-    CalculateAndPrint.printCalculation(inputNumber: inputNumber, formula: multiplyFormula, targetMeasure: checkedTargetMeasure)
-    //  전체 프로세스 진행 후 다시 앱 실행
-    return runApp()
 }
 runApp()
 
