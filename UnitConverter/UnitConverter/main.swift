@@ -12,13 +12,13 @@ import Foundation
 //구체적인 공식내용은 딕셔너리로 정리
 struct FormulaSet{
     // 공식을 저장하는 dictionary
-    let formula = ["length" : ["inWorking" :["m":100.0,"cm":1.0,"yard":91.44,"inch":2.54]
+    private let formula = ["length" : ["inWorking" :["m":100.0,"cm":1.0,"yard":91.44,"inch":2.54]
                             , "outWorking" : ["m":0.01,"cm":1.0,"yard":0.01,"inch":0.39]]
                 ,"weight" : ["inWorking" : ["kg":1.0,"oz":35.27,"lb":0.45]
                             , "outWorking" : ["kg":1.0,"oz":0.02,"lb":2.2]]]
     
     // 단위의 타입을 리턴하는 함수
-    func typeHas(inputMeasure : String) -> String?  {
+    private func typeHas(inputMeasure : String) -> String?  {
         for type in formula.keys{
             if formula[type]?["inWorking"]?[inputMeasure] != nil {
                 return type
@@ -27,7 +27,7 @@ struct FormulaSet{
         return nil
     }
     // 타입과 입력단위,목표단위를
-    func formularNumberFrom(type : String, inMeasure : String,outMeasure : String) -> (inFormula : Double,outFormula : Double)?{
+    private func formularNumberFrom(type : String, inMeasure : String,outMeasure : String) -> (inFormula : Double,outFormula : Double)?{
         if let inFormula = formula[type]?["inWorking"]?[inMeasure] ,let outFormula = formula[type]?["outWorking"]?[outMeasure] {
             return (inFormula,outFormula)
         }
@@ -37,7 +37,7 @@ struct FormulaSet{
     }
     
     // 입력단위,타겟단위 닐체크 하고 둘의 종류가 같다면 종류 리턴
-    func measureTypeFrom( inputMeasure : String , targetMeasure : String) -> (String)?{
+    private func measureTypeFrom( inputMeasure : String , targetMeasure : String) -> (String)?{
         if let inputType = typeHas(inputMeasure: inputMeasure) , let targetType = typeHas(inputMeasure: targetMeasure) , inputType == targetType{
             return (inputType)
         }
@@ -61,7 +61,7 @@ struct FormulaSet{
 //유저의 입력값을 받아서 리턴.
 struct InputGetter {
     //유저 입력을 받는 함수
-    func userInputReciever()->String {
+    private func userInputReciever()->String {
         //유저 입력을 받기 위해 입력을 요청
         print("Please enter size : ", terminator: "")
         //유저 입력을 받아서 userInput 에 입력
@@ -74,7 +74,7 @@ struct InputGetter {
     }
     
     //입력받은 문자열이 q or quit 일 경우 false 리턴
-    func checkQuit(letters : String) -> Bool {
+    private func checkQuit(letters : String) -> Bool {
         if letters == "q" || letters == "quit" {
             return true
         } else {
@@ -99,7 +99,7 @@ struct InputGetter {
 // 입력받은 문자열을 나눠주는 객체
 struct InputDivider{
     //공백을 기준으로 문자열을 나누어서 리턴하는 함수. 공백이 없으면 두번째 리턴값은 ""
-    func dividedArrayFrom(letters : String) -> (frontLaters : String, behindLetters : String){
+    private func dividedArrayFrom(letters : String) -> (frontLaters : String, behindLetters : String){
         let arry = letters.components(separatedBy: " ")
         if arry.count == 1 {
             return (letters,"")
@@ -109,28 +109,28 @@ struct InputDivider{
     }
     
     // 문자열을 입력받아 숫자와 . 갯수를 더해서 리턴
-    func dotsNumberFrom(letters : String) -> Int{
-        var numberOfNumber = letters.components(separatedBy: CharacterSet.decimalDigits.inverted).joined().count
+    private func dotsNumberFrom(letters : String) -> Int{
+        var countNumber = letters.components(separatedBy: CharacterSet.decimalDigits.inverted).joined().count
         // . 이 있으면 넘버 숫자에  +1
         if letters.contains("."){
-            numberOfNumber += 1
+            countNumber += 1
         }
-        return numberOfNumber
+        return countNumber
     }
     
     // 문자열과 숫자를 입력받아 처음~숫자개수 까지의 String을 리턴하는 함수
-    func betweenBeginAndPoint(letters : String, numberOfLetter : Int) -> Range<String.Index>{
+    private func betweenBeginAndPoint(letters : String, numberOfLetter : Int) -> Range<String.Index>{
         // 입력받은 문자열에서 처음~숫자개수 까지의 인덱스 생성
         return letters.startIndex..<letters.index(letters.startIndex,offsetBy: numberOfLetter)
     }
     // 문자열과 숫자를 입력받아 숫자개수~끝 까지의 String을 리턴하는 함수
-    func betweenPointAndEnd(letters : String, numberOfLetter : Int) -> Range<String.Index>{
+    private func betweenPointAndEnd(letters : String, numberOfLetter : Int) -> Range<String.Index>{
         // 입력받은 문자열에서 숫자개수~끝 까지의 인덱스 생성
         return  letters.index(letters.startIndex,offsetBy: numberOfLetter)..<letters.endIndex
     }
     
     // 문자열과 범위를 받아서 범위만큼 리턴하는 함수
-    func substringLettersFrom(letters : String, rangeIndex : Range<String.Index>) -> String {
+    private func substringLettersFrom(letters : String, rangeIndex : Range<String.Index>) -> String {
         return String(letters[rangeIndex])
     }
     
@@ -140,23 +140,23 @@ struct InputDivider{
         let (numberWithMeasure,targetMeasure) = dividedArrayFrom(letters: letters)
         
         // 입력받은 문자열의 숫자갯수
-        let numberOfNumber = dotsNumberFrom(letters: numberWithMeasure)
+        let countNumber = dotsNumberFrom(letters: numberWithMeasure)
         //숫자와 문자 범위인덱스 생성
-        let numberRange = betweenBeginAndPoint(letters: numberWithMeasure, numberOfLetter: numberOfNumber)
-        let inputMeasureRange = betweenPointAndEnd(letters: numberWithMeasure, numberOfLetter: numberOfNumber)
+        let numberRange = betweenBeginAndPoint(letters: numberWithMeasure, numberOfLetter: countNumber)
+        let inputMeasureRange = betweenPointAndEnd(letters: numberWithMeasure, numberOfLetter: countNumber)
         
         // 범위인덱스로 문자열 분리
-        let number = substringLettersFrom(letters: numberWithMeasure, rangeIndex: numberRange)
+        let extractedNumber = substringLettersFrom(letters: numberWithMeasure, rangeIndex: numberRange)
         let inputMeasure = substringLettersFrom(letters: numberWithMeasure, rangeIndex: inputMeasureRange)
         // 분리된 변수들을 리턴
-        return (number,inputMeasure,targetMeasure)
+        return (extractedNumber,inputMeasure,targetMeasure)
     }
 }
 
 // 유저 입력값을 받아서 검증하고 계산용으로 리턴하는 객체
 struct InputChecker {
     //변환할 단위가 없는경우를 위한 함수
-    func fillEmpty(inputMeasure : String, targetMeasure : String)-> String {
+    private func fillEmpty(inputMeasure : String, targetMeasure : String)-> String {
         if inputMeasure == "cm" && targetMeasure == "" {
             return "m"
         }
@@ -169,7 +169,7 @@ struct InputChecker {
     }
     
     //문자열을 더블로 바꿔 리턴해주는 함수. 바꾸기 실패할 경우 nil 리턴
-    func numberFrom(letters : String) -> Double? {
+    private func numberFrom(letters : String) -> Double? {
         if let number = Double(letters){
             return number
         }
